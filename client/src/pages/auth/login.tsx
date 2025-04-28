@@ -38,21 +38,22 @@ export default function Login() {
     setIsLoading(true);
     
     try {
-      // Normally we would make an API call here
-      console.log('Login with:', values);
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
       
-      // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!response.ok) {
+        throw new Error(data.message || 'Login failed');
+      }
       
-      // Dispatch login action
-      dispatch(login({
-        id: 1,
-        email: values.email,
-        username: "doctoruser",
-        firstName: "John",
-        lastName: "Smith",
-        role: "doctor"
-      }));
+      // Dispatch login action with returned user data
+      dispatch(login(data.data));
       
       toast({
         title: "Login successful",
@@ -60,12 +61,12 @@ export default function Login() {
       });
       
       setLocation('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Login error:', error);
       toast({
         variant: "destructive",
         title: "Login failed",
-        description: "Please check your credentials and try again."
+        description: error.message || "Please check your credentials and try again"
       });
     } finally {
       setIsLoading(false);

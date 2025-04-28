@@ -51,24 +51,36 @@ export default function Register() {
     setIsLoading(true);
     
     try {
-      console.log('Register with:', values);
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      const data = await response.json();
       
-      // Simulating API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!response.ok) {
+        throw new Error(data.message || 'Registration failed');
+      }
       
       toast({
         title: "Registration successful",
-        description: "Please check your email to verify your account",
+        description: "Please login with your new account",
       });
       
-      // Redirect to the login page
-      setLocation('/auth/login');
-    } catch (error) {
+      // Redirect to the login page after a short delay
+      setTimeout(() => {
+        setLocation('/auth/login');
+      }, 2000);
+      
+    } catch (error: any) {
       console.error('Registration error:', error);
       toast({
         variant: "destructive",
         title: "Registration failed",
-        description: "Please try again later or contact support."
+        description: error.message || "Please try again later"
       });
     } finally {
       setIsLoading(false);
