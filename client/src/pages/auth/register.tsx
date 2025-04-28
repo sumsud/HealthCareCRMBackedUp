@@ -75,10 +75,16 @@ export default function Register() {
         description: "Please login with your new account"
       });
       
-      // Redirect to the login page after a delay to show the success message
+      // Show success message and redirect after delay
+      toast({
+        variant: "default",
+        title: "Registration successful!",
+        description: "Please login with your new account"
+      });
+      
       setTimeout(() => {
         setLocation('/auth/login');
-      }, 1500);
+      }, 2000);
       
     } catch (error: any) {
       console.error('Registration error:', error);
