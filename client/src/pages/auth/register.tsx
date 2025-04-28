@@ -62,18 +62,23 @@ export default function Register() {
       const data = await response.json();
       
       if (!response.ok) {
+        toast({
+          variant: "destructive",
+          title: "Registration failed",
+          description: data.message || "Please try again later"
+        });
         throw new Error(data.message || 'Registration failed');
       }
       
       toast({
         title: "Registration successful",
-        description: "Please login with your new account",
+        description: "Please login with your new account"
       });
       
-      // Redirect to the login page after a short delay
+      // Redirect to the login page after a delay to show the success message
       setTimeout(() => {
         setLocation('/auth/login');
-      }, 2000);
+      }, 1500);
       
     } catch (error: any) {
       console.error('Registration error:', error);

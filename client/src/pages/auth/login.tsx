@@ -49,6 +49,11 @@ export default function Login() {
       const data = await response.json();
       
       if (!response.ok) {
+        toast({
+          variant: "destructive", 
+          title: "Login failed",
+          description: data.message || "Invalid credentials"
+        });
         throw new Error(data.message || 'Login failed');
       }
       
