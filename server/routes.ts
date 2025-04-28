@@ -106,6 +106,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Activity routes
   app.get("/api/activities", authenticateJWT, patientsController.getActivities);
+  
+  // Static HTML pages for auth (temporary solution)
+  app.get(["/auth/login", "/auth/register", "/auth/forgot-password", "/auth/reset-password"], (req, res) => {
+    res.sendFile("auth.html", { root: "./client" });
+  });
 
   // Stripe direct payment routes for one-time payments
   app.post("/api/create-payment-intent", authenticateJWT, async (req, res) => {
