@@ -1,11 +1,12 @@
 import React from 'react';
+import {Toaster} from 'react-hot-toast';
 
 function App() {
   return (
     <div className="h-screen w-full flex flex-col items-center justify-center">
       <h1 className="text-3xl font-bold mb-4">HealthcareCRM</h1>
       <p className="text-lg mb-8">HIPAA-Compliant Healthcare Management Solution</p>
-      
+
       <div className="flex gap-4">
         <a href="/auth/login" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
           Login
@@ -14,6 +15,7 @@ function App() {
           Sign Up
         </a>
       </div>
+      <Toaster />
     </div>
   );
 }

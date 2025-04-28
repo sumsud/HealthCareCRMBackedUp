@@ -71,12 +71,6 @@ export default function Register() {
       }
       
       toast({
-        title: "Registration successful",
-        description: "Please login with your new account"
-      });
-      
-      // Show success message and redirect after delay
-      toast({
         variant: "default",
         title: "Registration successful!",
         description: "Please login with your new account"
