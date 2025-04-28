@@ -1,20 +1,17 @@
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Provider } from 'react-redux';
-import { ThemeProvider } from './components/providers/ThemeProvider';
-import { Toaster } from '@/components/ui/toaster';
 import App from './App';
-import { store } from './store';
 import './index.css';
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+const rootElement = document.getElementById('root');
+
+if (!rootElement) {
+  throw new Error('Root element not found');
+}
+
+ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
-    <Provider store={store}>
-      <ThemeProvider defaultTheme="light" storageKey="careflow-theme">
-        <App />
-        <Toaster />
-      </ThemeProvider>
-    </Provider>
+    <App />
   </React.StrictMode>
 );

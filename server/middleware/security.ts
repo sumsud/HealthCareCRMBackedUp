@@ -35,14 +35,23 @@ export const secureCookies = (req: Request, res: Response, next: NextFunction) =
 
 // Content Security Policy Middleware
 export const contentSecurityPolicy = (req: Request, res: Response, next: NextFunction) => {
-  // Define CSP directives
+  // Check for development mode
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  // Define CSP directives with looser restrictions for development mode
   const cspDirectives = [
     "default-src 'self'",
-    "script-src 'self' https://js.stripe.com",
+    // Allow unsafe-inline and unsafe-eval for dev mode with Vite/React hot module replacement
+    isDevelopment 
+      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://replit.com"
+      : "script-src 'self' https://js.stripe.com", 
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: https://res.cloudinary.com",
-    "connect-src 'self' https://api.stripe.com https://api.openai.com",
+    // Allow websocket connections for HMR in development
+    isDevelopment
+      ? "connect-src 'self' https://api.stripe.com https://api.openai.com ws://localhost:* wss://localhost:* ws://0.0.0.0:* wss://0.0.0.0:*" 
+      : "connect-src 'self' https://api.stripe.com https://api.openai.com",
     "frame-src 'self' https://js.stripe.com",
     "object-src 'none'"
   ].join('; ');

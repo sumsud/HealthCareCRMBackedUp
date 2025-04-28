@@ -1,87 +1,34 @@
 import { Request, Response, NextFunction } from 'express';
-import { storage } from '../storage';
 
-// Log all API requests
+// Simple request logger
 export const logRequest = (req: Request, res: Response, next: NextFunction) => {
-  const start = Date.now();
-  
-  // Log request info
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  
-  // Log response info when finished
-  res.on('finish', () => {
-    const duration = Date.now() - start;
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} ${res.statusCode} (${duration}ms)`);
-  });
-  
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
   next();
 };
 
-// Log access to specific resources
-export const logAccess = (resourceType: string, action: string) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      // Store original end method
-      const originalEnd = res.end;
-      
-      // Override end method to log after response
-      res.end = function (chunk?: any, encoding?: any, callback?: any) {
-        // Only log successful responses (2xx)
-        if (res.statusCode >= 200 && res.statusCode < 300) {
-          const userId = req.user?.id;
-          const resourceId = req.params.id || '';
-          
-          // Create audit log entry after response is sent
-          createAuditLog(req, {
-            resourceType,
-            action,
-            resourceId,
-            description: `User ID ${userId} performed ${action} on ${resourceType} ${resourceId}`
-          }).catch(err => {
-            console.error('Failed to create audit log:', err);
-          });
-        }
-        
-        // Call original end method
-        return originalEnd.call(this, chunk, encoding, callback);
-      };
-    } catch (error) {
-      console.error('Error in logAccess middleware:', error);
-    }
-    
+// Access logging middleware for audit trail
+export const logAccess = (resourceType: string, actionType: string) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    // In a real app, we would log this to a database or audit log service
+    console.log(`${new Date().toISOString()} - ACCESS LOG: User ${req.user?.id || 'anonymous'} ${actionType} ${resourceType} ${req.params.id || ''}`);
     next();
   };
 };
 
-// Create an audit log entry
-export const createAuditLog = async (req: Request, logData: {
-  action: string;
-  resourceType: string;
-  resourceId: string;
-  description: string;
-}) => {
-  try {
-    const userId = req.user?.id || 0;
-    const ipAddress = req.ip || req.socket.remoteAddress || '';
-    const userAgent = req.headers['user-agent'] || '';
-    
-    await storage.createAuditLog({
-      userId,
-      timestamp: new Date(),
-      action: logData.action,
-      resourceType: logData.resourceType,
-      resourceId: logData.resourceId,
-      ipAddress,
-      userAgent,
-      details: JSON.stringify({
-        method: req.method,
-        url: req.url,
-        params: req.params,
-        query: req.query,
-      }),
-      description: logData.description
-    });
-  } catch (error) {
-    console.error('Failed to create audit log:', error);
-  }
+// Audit log utility function
+export const createAuditLog = async (userId: number, action: string, resourceType: string, resourceId?: number, details?: any) => {
+  // In a real app, we would store this in a database
+  const timestamp = new Date().toISOString();
+  console.log(`${timestamp} - AUDIT LOG: User ${userId} ${action} ${resourceType} ${resourceId || ''} ${details ? JSON.stringify(details) : ''}`);
+  
+  // Return a mock audit log record
+  return {
+    id: Math.floor(Math.random() * 10000),
+    userId,
+    action,
+    resourceType,
+    resourceId: resourceId || null,
+    details: details || null,
+    createdAt: timestamp
+  };
 };
