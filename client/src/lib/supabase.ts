@@ -1,52 +1,43 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '../types/supabase';
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables. Authentication might not work correctly.');
+  console.warn('Missing Supabase environment variables. Authentication might not work correctly.');
 }
 
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-  auth: {
-    persistSession: true,
-    storageKey: 'careflow-auth',
-  },
-});
+export const supabase = createClient(
+  supabaseUrl || '',
+  supabaseAnonKey || '',
+  {
+    auth: {
+      persistSession: true,
+    }
+  }
+);
 
-export async function signInWithEmail(email: string, password: string) {
-  return supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-}
+// Auth helper functions
+export const signInWithEmail = async (email: string, password: string) => {
+  return supabase.auth.signInWithPassword({ email, password });
+};
 
-export async function signUpWithEmail(email: string, password: string, metadata?: any) {
-  return supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: metadata,
-    },
-  });
-}
+export const signUpWithEmail = async (email: string, password: string, options?: any) => {
+  return supabase.auth.signUp({ email, password, options });
+};
 
-export async function signOut() {
+export const signOut = async () => {
   return supabase.auth.signOut();
-}
+};
 
-export async function resetPassword(email: string) {
-  return supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/auth/reset-password`,
-  });
-}
+export const resetPassword = async (email: string) => {
+  return supabase.auth.resetPasswordForEmail(email);
+};
 
-export async function updatePassword(password: string) {
-  return supabase.auth.updateUser({
-    password,
-  });
-}
+export const updatePassword = async (newPassword: string) => {
+  return supabase.auth.updateUser({ password: newPassword });
+};
 
 export async function getCurrentUser() {
   const { data: { session } } = await supabase.auth.getSession();
