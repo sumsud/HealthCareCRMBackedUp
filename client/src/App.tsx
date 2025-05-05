@@ -1,22 +1,42 @@
-import React from 'react';
+
+import React, { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { Route, Switch } from 'wouter';
 import { Toaster } from '@/components/ui/toaster';
+import { AuthGuard } from '@/components/auth/AuthGuard';
+import { checkAuth } from '@/store/slices/authSlice';
+
+// Import pages
+import Login from '@/pages/auth/login';
+import Register from '@/pages/auth/register';
+import Dashboard from '@/pages/dashboard';
+import NotFound from '@/pages/not-found';
 
 function App() {
-  return (
-    <div className="h-screen w-full flex flex-col items-center justify-center">
-      <h1 className="text-3xl font-bold mb-4">HealthcareCRM</h1>
-      <p className="text-lg mb-8">HIPAA-Compliant Healthcare Management Solution</p>
+  const dispatch = useDispatch();
 
-      <div className="flex gap-4">
-        <a href="/auth/login" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-          Login
-        </a>
-        <a href="/auth/register" className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100">
-          Sign Up
-        </a>
-      </div>
+  useEffect(() => {
+    dispatch(checkAuth());
+  }, [dispatch]);
+
+  return (
+    <>
+      <Switch>
+        <Route path="/auth/login" component={Login} />
+        <Route path="/auth/register" component={Register} />
+        
+        {/* Protected routes */}
+        <Route path="/dashboard">
+          <AuthGuard>
+            <Dashboard />
+          </AuthGuard>
+        </Route>
+        
+        <Route path="/" component={Login} />
+        <Route component={NotFound} />
+      </Switch>
       <Toaster />
-    </div>
+    </>
   );
 }
 

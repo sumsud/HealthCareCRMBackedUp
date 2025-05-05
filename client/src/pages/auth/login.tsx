@@ -38,34 +38,16 @@ export default function Login() {
     setIsLoading(true);
     
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(values),
-      });
-
-      const data = await response.json();
+      const actionResult = await dispatch(login(values)).unwrap();
       
-      if (!response.ok) {
+      if (actionResult) {
         toast({
-          variant: "destructive", 
-          title: "Login failed",
-          description: data.message || "Invalid credentials"
+          title: "Login successful",
+          description: "Welcome back!",
         });
-        throw new Error(data.message || 'Login failed');
+        
+        setLocation('/dashboard');
       }
-      
-      // Dispatch login action with returned user data
-      dispatch(login(data.data));
-      
-      toast({
-        title: "Login successful",
-        description: "Welcome back!",
-      });
-      
-      setLocation('/dashboard');
     } catch (error: any) {
       console.error('Login error:', error);
       toast({

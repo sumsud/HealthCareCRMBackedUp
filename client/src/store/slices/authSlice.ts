@@ -47,24 +47,14 @@ export const login = createAsyncThunk(
   'auth/login',
   async (credentials: LoginRequest, { rejectWithValue }) => {
     try {
-      const { data, error } = await signInWithEmail(credentials.email, credentials.password);
+      const response = await apiService.post('/auth/login', credentials);
       
-      if (error) {
-        return rejectWithValue(error.message);
+      if (response.token) {
+        localStorage.setItem('token', response.token);
+        apiService.setAuthToken(response.token);
       }
       
-      // Get additional user info from our API after successful auth
-      if (data?.user) {
-        const userProfile = await apiService.get(`/auth/profile`);
-        
-        return {
-          id: data.user.id,
-          email: data.user.email,
-          ...userProfile
-        };
-      }
-      
-      return null;
+      return response.data;
     } catch (error: any) {
       return rejectWithValue(error.message || 'Login failed');
     }

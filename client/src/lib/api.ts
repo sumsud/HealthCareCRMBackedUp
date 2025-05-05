@@ -11,10 +11,25 @@ const api = axios.create({
   withCredentials: true, // Include cookies for authentication
 });
 
+export const setAuthToken = (token: string | null) => {
+  if (token) {
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    localStorage.setItem('token', token);
+  } else {
+    delete api.defaults.headers.common['Authorization'];
+    localStorage.removeItem('token');
+  }
+};
+
+// Initialize auth token from storage
+const storedToken = localStorage.getItem('token');
+if (storedToken) {
+  setAuthToken(storedToken);
+}
+
 // Add a request interceptor for auth
 api.interceptors.request.use(
   (config) => {
-    // Get the token from localStorage if using token-based auth
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
